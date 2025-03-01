@@ -64,15 +64,27 @@ check_dependencies() {
         exit 1
     fi
     
-    python_version=$(python3 --version | awk '{print $2}')
-    python_major=$(echo $python_version | cut -d. -f1)
-    python_minor=$(echo $python_version | cut -d. -f2)
-    
-    if [ "$python_major" -lt 3 ] || ([ "$python_major" -eq 3 ] && [ "$python_minor" -lt 8 ]); then
-        log_error "Python 3.8+ is required, but you have $python_version. Please upgrade."
-        exit 1
-    fi
+    # Get Python version
+    python_version=$(python3 --version 2>&1 | awk '{print $2}')
     log_info "Found Python $python_version"
+    
+    # Check Python version using Python itself for accurate comparison
+    python_version_check=$(python3 -c '
+import sys
+if sys.version_info < (3, 8):
+    print("ERROR:Python 3.8+ is required, but you have Python {}.{}.{}. Please upgrade.".format(
+        sys.version_info.major, sys.version_info.minor, sys.version_info.micro))
+    exit(1)
+else:
+    print("OK")
+' 2>&1) || {
+        if [[ "$python_version_check" == ERROR:* ]]; then
+            log_error "${python_version_check#ERROR:}"
+        else
+            log_error "Unknown Python version error. Please ensure you have Python 3.8+."
+        fi
+        exit 1
+    }
     
     # Check for pip
     if ! command -v pip3 &> /dev/null; then
