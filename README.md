@@ -811,8 +811,7 @@ chmod +x scripts/setup-borg.sh
 cat > scripts/backup.sh << 'EOF'
 #!/bin/bash
 
-# Source configuration files
-source ~/.config/rclone/matrix_backup_config
+# Source Borg configuration
 source ~/.config/borg/matrix_backup_config
 export BORG_PASSPHRASE
 
@@ -1152,89 +1151,21 @@ docker-compose up -d prometheus grafana
 
 ## ⚠️ Security Best Practices
 
-1. Regularly update all components with `docker-compose pull && docker-compose up -d`
-2. Use strong, unique passwords for all services
-3. Rotate encryption keys quarterly
-4. Monitor logs for suspicious activity
-5. Keep all certificates up to date with frequent renewal checks
-6. Implement IP-based rate limiting at the nginx level
-7. Enable fail2ban to prevent brute force attempts
-8. Follow backup 3-2-1 rule: 3 copies of data, 2 different storage types, 1 offsite backup
-9. Encrypt all backups with post-quantum algorithms
-10. Regularly test the restoration process
+1. **Physical Security**
+   - Deploy on hardware with secure boot and TPM
+   - Restrict physical access to servers
 
-### Automated Security Checks
+2. **Key Management**
+   - Store recovery keys in separate secure locations
+   - Use hardware security keys for administrator access
 
-```bash
-cat > scripts/security-check.sh << 'EOF'
-#!/bin/bash
+3. **Monitoring**
+   - Enable alerts for unusual access patterns
+   - Monitor system logs for suspicious activity
 
-# Variables
-LOG_FILE=~/matrix-server/logs/security-check.log
-mkdir -p ~/matrix-server/logs
-
-# Function for logging
-log() {
-    echo "$(date +'%Y-%m-%d %H:%M:%S') - $1" | tee -a $LOG_FILE
-}
-
-log "Starting security audit..."
-
-# Check SSL certificate expiry
-DOMAIN="yourdomain.com"
-CERT_EXPIRY=$(openssl x509 -enddate -noout -in ~/matrix-server/certs/fullchain.pem | cut -d= -f2)
-CERT_EXPIRY_EPOCH=$(date -d "$CERT_EXPIRY" +%s)
-CURRENT_EPOCH=$(date +%s)
-DAYS_REMAINING=$(( ($CERT_EXPIRY_EPOCH - $CURRENT_EPOCH) / 86400 ))
-
-log "SSL certificate expires in $DAYS_REMAINING days"
-if [ $DAYS_REMAINING -lt 15 ]; then
-    log "WARNING: Certificate expiring soon!"
-fi
-
-# Check Docker container updates
-log "Checking for container updates..."
-cd ~/matrix-server
-UPDATES_NEEDED=$(docker-compose pull | grep -c "Image up to date")
-if [ $UPDATES_NEEDED -gt 0 ]; then
-    log "Some containers have updates available. Consider running docker-compose up -d"
-fi
-
-# Check for exposed ports
-log "Checking for unnecessary exposed ports..."
-EXPOSED_PORTS=$(sudo netstat -tulpn | grep LISTEN)
-echo "$EXPOSED_PORTS" >> $LOG_FILE
-# Check specifically for Matrix-related ports
-echo "$EXPOSED_PORTS" | grep -E '(8455|5349|3478)' >> $LOG_FILE
-
-# Check disk space for backups
-DISK_SPACE=$(df -h | grep "/dev/sda1")
-log "Disk space: $DISK_SPACE"
-
-# Check fail2ban status
-if command -v fail2ban-client &> /dev/null; then
-    FAIL2BAN_STATUS=$(sudo fail2ban-client status)
-    log "Fail2ban status: $FAIL2BAN_STATUS"
-else
-    log "WARNING: fail2ban not installed!"
-fi
-
-# Check firewall status
-if command -v ufw &> /dev/null; then
-    UFW_STATUS=$(sudo ufw status)
-    log "Firewall status: $UFW_STATUS"
-else
-    log "WARNING: ufw not installed or not configured!"
-fi
-
-log "Security audit completed"
-EOF
-
-chmod +x scripts/security-check.sh
-
-# Add to crontab (daily security checks)
-(crontab -l 2>/dev/null; echo "0 1 * * * ~/matrix-server/scripts/security-check.sh") | crontab -
-```
+4. **Updates**
+   - Keep all components updated with security patches
+   - Follow cryptographic agility principles
 
 ## 🤝 Contributing
 
@@ -1338,7 +1269,7 @@ The deployment process is modular and secure:
 - Implements quantum-resistant encryption
 - Sets up scheduled backup jobs
 
-### Phase 4: Cloudflare Integration
+### Phase 4: Cloud Integration
 - Automates DNS management
 - Configures Zero Trust access policies
 - Enables quantum-safe TLS connections
@@ -1350,8 +1281,23 @@ The deployment process is modular and secure:
 
 ## 🛠️ Technical Architecture
 
-### Hardware Security Module
-The system integrates with hardware security modules via:
+### System Components
+
+```
+┌─────────────────────────────────┐
+│ PQ Matrix Ecosystem             │
+├─────────────────┬───────────────┤
+│ Deploy Script   │ Key Management│
+├─────────────────┼───────────────┤
+│ Secure Storage  │ Backup System │
+├─────────────────┼───────────────┤
+│ Cloud API       │ System Harden │
+└─────────────────┴───────────────┘
+```
+
+### Key Technologies
+
+#### Hardware Security Module
 ```python
 class QuantumHSM:
     def __init__(self):
@@ -1365,9 +1311,8 @@ class QuantumHSM:
         )
 ```
 
-### Distributed Trust Implementation
-Keys are split across geographic regions using threshold cryptography:
-```bash
+#### Distributed Trust Implementation
+```python
 class DistributedTrust:
     def __init__(self, shares=5, threshold=3):
         self.dkg = DistributedKeyGenerator(
@@ -1377,9 +1322,8 @@ class DistributedTrust:
         )
 ```
 
-### Zero-Logs Policy
-Memory-safe logging with no persistent storage:
-```bash
+#### Zero-Logs Implementation
+```python
 class SecureLogger:
     def __init__(self):
         self.buffer = mmap.mmap(-1, 1024)
@@ -1394,33 +1338,72 @@ class SecureLogger:
         self.buffer.write(b'\0'*1024)
 ```
 
-## 📋 Requirements
+## 🔄 Maintenance & Operations
 
-- Ubuntu 20.04+ or Debian-based system
-- Python 3.8+
-- Internet connectivity
-- Administrative privileges
+### Routine Maintenance
 
-## 🔧 Recommended Hardware
+| Task | Frequency | Command |
+|------|-----------|---------|
+| **Update System** | Weekly | `pq-matrix update` |
+| **Key Rotation** | Quarterly | `pq-matrix rotate-keys` |
+| **Security Audit** | Monthly | `pq-matrix audit` |
+| **Backup Verification** | Weekly | `pq-matrix verify-backup` |
 
-- CPU: 4+ cores
-- RAM: 8GB+
-- Storage: 100GB+ SSD
-- Optional: Hardware Security Module (YubiHSM 2)
+### Security Best Practices
 
-## ⚠️ Security Considerations
+1. **Physical Security**
+   - Deploy on hardware with secure boot and TPM
+   - Restrict physical access to servers
 
-1. **Physical Security**: For maximum security, deploy on hardware with secure boot and TPM.
-2. **Key Management**: Store recovery keys in secure, separate locations.
-3. **Regular Audits**: Periodically verify the integrity of your deployment.
-4. **Geographic Distribution**: For critical applications, use multi-region HSM deployments.
+2. **Key Management**
+   - Store recovery keys in separate secure locations
+   - Use hardware security keys for administrator access
 
-## 🔄 Ongoing Maintenance
+3. **Monitoring**
+   - Enable alerts for unusual access patterns
+   - Monitor system logs for suspicious activity
 
-- **Key Rotation**: Automatic quarterly rotation of cryptographic keys
-- **Security Updates**: Continuous integration of post-quantum algorithm updates
-- **Compliance Checks**: Regular validation against FIPS 140-3 standards
+4. **Updates**
+   - Keep all components updated with security patches
+   - Follow cryptographic agility principles
+
+## ❓ Troubleshooting
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| **Installation fails** | Check system requirements and network connectivity |
+| **HSM connection error** | Verify YubiHSM is properly connected and initialized |
+| **Key distribution failure** | Check network connectivity to all cloud providers |
+| **Permission denied** | Ensure proper sudo access and file permissions |
+
+### Diagnostic Commands
+
+```bash
+# Check system status
+pq-matrix status
+
+# Run diagnostics
+pq-matrix diagnose
+
+# View logs (secure view)
+pq-matrix logs --safe
+```
+
+### Getting Help
+
+- Open an issue on GitHub: [PQ-Matrix-Installer Issues](https://github.com/MNylif/PQ-Matrix-Installer/issues)
+- Join our secure chat: [Matrix Room](https://matrix.to/#/#pq-matrix:matrix.org)
 
 ## 📜 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/MNylif/PQ-Matrix-Installer/main/docs/logo.png" alt="PQ Matrix Logo" width="200"/>
+  <br>
+  <em>Quantum-Resistant. Military-Grade. Open Source.</em>
+</p>
