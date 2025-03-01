@@ -6,3 +6,5 @@ click
 pyhsm>=2.4.0
 threshold-crypto==0.5.1
 liboqs>=0.8.0
+psutil>=5.9.0
+cryptography>=39.0.0

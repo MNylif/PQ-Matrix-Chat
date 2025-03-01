@@ -58,6 +58,29 @@ python deploy.py --generate-shards
 python deploy.py --deploy-shards
 ```
 
+### Resource Optimization
+
+The system automatically scans available resources and optimizes cryptographic parameters based on your hardware capabilities:
+
+```bash
+# View resource optimization details
+python deploy.py --optimize-resources
+```
+
+#### Optimization Levels
+
+| Resource Level | CPU Cores | Memory | Kyber Variant | Shard Count | Parallel Processing |
+|----------------|-----------|--------|---------------|-------------|---------------------|
+| Low            | < 4       | < 4GB  | Kyber512      | 3           | Disabled            |
+| Standard       | 4-8       | 4-16GB | Kyber768      | 5           | Limited             |
+| High           | > 8       | > 16GB | Kyber1024     | 5           | Full                |
+
+The system automatically adjusts:
+- **Thread Pool Size**: Optimized for your CPU core count
+- **Memory Buffer Allocation**: Scaled based on available RAM
+- **Compression Level**: Adjusted based on available disk space
+- **Cryptographic Parameters**: Security level balanced with performance
+
 ## 📊 Security Verification
 
 ```bash
@@ -110,3 +133,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - ✅ Cloudflare Zero Trust Integration
 - ✅ Atomic Operations with Rollback
 - ✅ Immutable Audit Logging
+- ✅ Adaptive Resource Optimization
