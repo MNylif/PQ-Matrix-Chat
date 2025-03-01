@@ -7,7 +7,7 @@ An automated installer for deploying a secure, quantum-resistant Matrix chat ser
 Just run the following command and follow the prompts:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/MNylif/PQ-Matrix-Chat/main/PQ-Matrix-Installer/install.sh | bash
 ```
 
 ## 🔐 What Is PQ Matrix?
@@ -68,7 +68,7 @@ The installer supports both interactive and non-interactive modes:
 Run without arguments for a step-by-step guided setup:
 
 ```bash
-curl -sL https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/MNylif/PQ-Matrix-Chat/main/PQ-Matrix-Installer/install.sh | bash
 ```
 
 ### Advanced Options

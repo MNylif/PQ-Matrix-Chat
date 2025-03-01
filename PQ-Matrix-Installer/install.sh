@@ -6,7 +6,7 @@
 # It handles dependencies, clones the repository, and launches the Python installer.
 #
 # Usage:
-#   curl -sL https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/install.sh | bash
+#   curl -sL https://raw.githubusercontent.com/MNylif/PQ-Matrix-Chat/main/PQ-Matrix-Installer/install.sh | bash
 #
 
 set -e
@@ -111,7 +111,7 @@ setup_installer() {
     log_info "Created temporary directory: $TEMP_DIR"
     
     # Clone the repository or download the files
-    GIT_URL="https://github.com/your-org/pq-matrix-installer.git"
+    GIT_URL="https://github.com/MNylif/PQ-Matrix-Chat.git"
     
     if command -v git &> /dev/null; then
         log_info "Cloning installer repository using Git..."
@@ -130,12 +130,9 @@ setup_installer() {
 download_installer() {
     log_info "Downloading installer files directly..."
     
-    # For now, we're downloading from the current repository
-    # This is a placeholder - in a real scenario, this would point to your repo
-    
     # Download the necessary files
-    curl -s -o "$TEMP_DIR/main.py" "https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/main.py"
-    curl -s -o "$TEMP_DIR/requirements.txt" "https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/requirements.txt"
+    curl -s -o "$TEMP_DIR/main.py" "https://raw.githubusercontent.com/MNylif/PQ-Matrix-Chat/main/PQ-Matrix-Installer/main.py"
+    curl -s -o "$TEMP_DIR/requirements.txt" "https://raw.githubusercontent.com/MNylif/PQ-Matrix-Chat/main/PQ-Matrix-Installer/requirements.txt"
     
     # Create necessary directories
     mkdir -p "$TEMP_DIR/src"
@@ -143,7 +140,7 @@ download_installer() {
     mkdir -p "$TEMP_DIR/config"
     
     # Download structure files (this is simplified; you would need more files)
-    curl -s -o "$TEMP_DIR/src/__init__.py" "https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/src/__init__.py"
+    curl -s -o "$TEMP_DIR/src/__init__.py" "https://raw.githubusercontent.com/MNylif/PQ-Matrix-Chat/main/PQ-Matrix-Installer/src/__init__.py"
 }
 
 # Install Python dependencies
