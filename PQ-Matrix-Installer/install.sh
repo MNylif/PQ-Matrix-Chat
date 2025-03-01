@@ -65,7 +65,10 @@ check_dependencies() {
     fi
     
     python_version=$(python3 --version | awk '{print $2}')
-    if [[ $(echo $python_version | awk -F. '{print $1"."$2}') < 3.8 ]]; then
+    python_major=$(echo $python_version | cut -d. -f1)
+    python_minor=$(echo $python_version | cut -d. -f2)
+    
+    if [ "$python_major" -lt 3 ] || ([ "$python_major" -eq 3 ] && [ "$python_minor" -lt 8 ]); then
         log_error "Python 3.8+ is required, but you have $python_version. Please upgrade."
         exit 1
     fi
