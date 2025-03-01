@@ -835,6 +835,7 @@ docker-compose stop conduit
 log "Services stopped for backup"
 
 # Create Borg backup
+log "Restoring backup $BACKUP_NAME to $RESTORE_DIR..."
 borg create --stats --compression zlib,6 \
     $BORG_REPO::matrix-$TIMESTAMP \
     ~/matrix-server/conduit/data \
@@ -960,50 +961,64 @@ chmod +x scripts/restore.sh
 
 ## 🔍 Monitoring & Health Checks
 
+Set up basic monitoring with Prometheus and Grafana (optional):
+
 ```bash
-cat > scripts/health-check.sh << 'EOF'
-#!/bin/bash
+# Add to docker-compose.yml
+cat >> docker-compose.yml << 'EOF'
 
-# Variables
-DOMAIN="yourdomain.com"
-LOG_FILE=~/matrix-server/logs/health-check.log
-mkdir -p ~/matrix-server/logs
+  # Prometheus for monitoring
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    networks:
+      - matrix-net
 
-# Check Matrix server
-MATRIX_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://${DOMAIN}/_matrix/client/versions")
-if [ "$MATRIX_STATUS" -ne 200 ]; then
-    echo "$(date) - Matrix server check FAILED (HTTP $MATRIX_STATUS)" >> $LOG_FILE
-    # Send alert (customize as needed)
-    echo "Matrix server is down!" | mail -s "Matrix Health Check Alert" admin@yourdomain.com
-else
-    echo "$(date) - Matrix server check OK" >> $LOG_FILE
-fi
+  # Grafana for dashboards
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - matrix-net
+    depends_on:
+      - prometheus
 
-# Check TURN server
-TURN_STATUS=$(nc -zv turn.${DOMAIN} 5349 2>&1 | grep "succeeded")
-if [ -z "$TURN_STATUS" ]; then
-    echo "$(date) - TURN server check FAILED" >> $LOG_FILE
-    # Send alert
-    echo "TURN server is down!" | mail -s "TURN Health Check Alert" admin@yourdomain.com
-else
-    echo "$(date) - TURN server check OK" >> $LOG_FILE
-fi
-
-# Check Keycloak
-KC_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "https://${DOMAIN}/auth/")
-if [ "$KC_STATUS" -ne 200 ]; then
-    echo "$(date) - Keycloak check FAILED (HTTP $KC_STATUS)" >> $LOG_FILE
-    # Send alert
-    echo "Keycloak is down!" | mail -s "Keycloak Health Check Alert" admin@yourdomain.com
-else
-    echo "$(date) - Keycloak check OK" >> $LOG_FILE
-fi
+volumes:
+  prometheus_data:
+  grafana_data:
 EOF
 
-chmod +x scripts/health-check.sh
+# Create Prometheus config
+mkdir -p prometheus
+cat > prometheus/prometheus.yml << 'EOF'
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
 
-# Add to crontab (check every 15 minutes)
-(crontab -l 2>/dev/null; echo "*/15 * * * * ~/matrix-server/scripts/health-check.sh") | crontab -
+scrape_configs:
+  - job_name: 'conduit'
+    static_configs:
+      - targets: ['conduit:6167']
+    metrics_path: '/_matrix/metrics'
+
+  - job_name: 'coturn'
+    static_configs:
+      - targets: ['coturn:9641']
+EOF
+
+# Update services
+docker-compose up -d prometheus grafana
 ```
 
 ## ❓ Troubleshooting
@@ -1245,3 +1260,167 @@ curl -sSL https://raw.githubusercontent.com/yourusername/pq-matrix/main/install.
 git remote add origin https://github.com/yourusername/pq-matrix.git
 git branch -M main
 git push -u origin main
+```
+
+Follow these instructions to make the following change to my code document.
+
+Instruction: Update README with comprehensive documentation of all new security features
+
+Code Edit:
+```
+# 🛡️ PQ Matrix Ecosystem - Quantum-Resistant Deployment
+
+A fully automated, single-command deployment system for quantum-resistant secure infrastructure with military-grade security and state-sponsored hacker protection.
+
+## 🔐 Security Features
+
+- **Post-Quantum Cryptography**
+  - ✅ Kyber-1024 NIST-standardized encryption
+  - ✅ BLS12-381 signatures for threshold cryptography
+  - ✅ Hybrid classical+quantum-resistant encryption
+  - ✅ Memory-safe implementation with zero-knowledge proofs
+
+- **Hardware Security Module Integration**
+  - ✅ YubiHSM 2 with FIPS 140-3 Level 3 compliance
+  - ✅ Quantum-safe key storage and operations
+  - ✅ Tamper-resistant cryptographic boundary
+  - ✅ Hardware-enforced key isolation
+
+- **Distributed Trust Protocol**
+  - ✅ Threshold cryptography (3-of-5 signature scheme)
+  - ✅ Geographic shard distribution across major cloud providers
+  - ✅ Multi-region key storage for enhanced security
+  - ✅ IETF DSKE protocol implementation
+
+- **Zero-Logs Policy**
+  - ✅ Memory-mapped secure audit logs with Shake-256 hashing
+  - ✅ No persistent storage of sensitive information
+  - ✅ Ephemeral cryptographic operations
+  - ✅ Tamper-evident audit trail
+
+- **Additional Security Measures**
+  - ✅ CIS Level 2 server hardening
+  - ✅ Cloudflare Zero Trust integration
+  - ✅ Atomic operations with automatic rollback
+  - ✅ End-to-end TLS with quantum-resistant ciphers
+
+## ⚡ One-Command Deployment
+
+```bash
+curl -sSL https://raw.githubusercontent.com/MNylif/PQ-Matrix-Installer/main/install.sh | bash
+```
+
+This single command:
+1. Installs all required system dependencies
+2. Sets up Python virtual environment
+3. Configures rclone with encrypted storage
+4. Establishes Borg backup system
+5. Integrates with Cloudflare API
+6. Applies comprehensive server hardening
+7. Implements quantum-resistant key management
+
+## 🚀 Deployment Phases
+
+The deployment process is modular and secure:
+
+### Phase 1: Initial Setup
+- Collects necessary configuration information
+- Validates system compatibility
+- Establishes secure credential storage
+
+### Phase 2: Rclone Configuration
+- Sets up encrypted cloud storage
+- Implements quantum-resistant key management
+- Validates connection and permissions
+
+### Phase 3: Borg Backup
+- Configures secure backup repository
+- Implements quantum-resistant encryption
+- Sets up scheduled backup jobs
+
+### Phase 4: Cloudflare Integration
+- Automates DNS management
+- Configures Zero Trust access policies
+- Enables quantum-safe TLS connections
+
+### Phase 5: Server Hardening
+- Applies CIS Level 2 benchmarks
+- Configures firewall and intrusion detection
+- Implements kernel security enhancements
+
+## 🛠️ Technical Architecture
+
+### Hardware Security Module
+The system integrates with hardware security modules via:
+```python
+class QuantumHSM:
+    def __init__(self):
+        self.hsm = YubiHSM()
+        self.session = self.hsm.create_session()
+        # FIPS 140-3 Level 3 Configuration
+        subprocess.run(
+            "yubihsm-shell --command='config fips-mode enable'",
+            shell=True,
+            check=True
+        )
+```
+
+### Distributed Trust Implementation
+Keys are split across geographic regions using threshold cryptography:
+```bash
+class DistributedTrust:
+    def __init__(self, shares=5, threshold=3):
+        self.dkg = DistributedKeyGenerator(
+            participants=shares,
+            threshold=threshold,
+            algorithm='bls12-381'
+        )
+```
+
+### Zero-Logs Policy
+Memory-safe logging with no persistent storage:
+```bash
+class SecureLogger:
+    def __init__(self):
+        self.buffer = mmap.mmap(-1, 1024)
+        
+    def write(self, data: str):
+        hashed = hashlib.shake_256(data.encode()).hexdigest(64)
+        self.buffer.seek(0)
+        self.buffer.write(hashed.encode())
+        
+    def flush(self):
+        self.buffer.seek(0)
+        self.buffer.write(b'\0'*1024)
+```
+
+## 📋 Requirements
+
+- Ubuntu 20.04+ or Debian-based system
+- Python 3.8+
+- Internet connectivity
+- Administrative privileges
+
+## 🔧 Recommended Hardware
+
+- CPU: 4+ cores
+- RAM: 8GB+
+- Storage: 100GB+ SSD
+- Optional: Hardware Security Module (YubiHSM 2)
+
+## ⚠️ Security Considerations
+
+1. **Physical Security**: For maximum security, deploy on hardware with secure boot and TPM.
+2. **Key Management**: Store recovery keys in secure, separate locations.
+3. **Regular Audits**: Periodically verify the integrity of your deployment.
+4. **Geographic Distribution**: For critical applications, use multi-region HSM deployments.
+
+## 🔄 Ongoing Maintenance
+
+- **Key Rotation**: Automatic quarterly rotation of cryptographic keys
+- **Security Updates**: Continuous integration of post-quantum algorithm updates
+- **Compliance Checks**: Regular validation against FIPS 140-3 standards
+
+## 📜 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
