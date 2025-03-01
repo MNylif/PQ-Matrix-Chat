@@ -1,136 +1,116 @@
-# 🛡️ PQ Matrix Installer: Post-Quantum Secure Communication
+# 🛡️ PQ Matrix Installer
 
-## ⚡ One-Command Installation
+An automated installer for deploying a secure, quantum-resistant Matrix chat server with a single command.
 
-```bash
-curl -sSL https://raw.githubusercontent.com/MNylif/PQ-Matrix-Installer/main/install.sh | bash
-```
+## 🚀 Quick Start
 
-## 🌍 Project Summary
-
-In a world where quantum computing and advanced AI threaten traditional encryption methods, communities and organizations need truly secure communication channels. The PQ Matrix Installer provides a fully automated, quantum-resistant deployment system for Matrix servers, ensuring private communications remain private - even against state-sponsored attackers with quantum capabilities.
-
-This project exists to democratize access to post-quantum security, allowing communities to communicate without fear of metadata collection, quantum decryption, or AI-powered surveillance. By combining hardware security modules, distributed trust protocols, and NIST-standardized post-quantum cryptography, we've created a system that's resistant to both current and future threats.
-
-## 🔒 Security Architecture
-
-### Military-Grade Quantum-Resistant Security
-
-- **Post-Quantum Cryptography**: NIST-standardized Kyber-1024 for key encapsulation
-- **Hardware Security Module Integration**: FIPS 140-3 Level 3 compliant YubiHSM
-- **Distributed Trust Protocol**: 3-of-5 threshold cryptography across geographic regions
-- **Zero-Knowledge Audit System**: Memory-mapped Shake-256 hashing with no persistent logs
-- **Automated CIS Level 2 Hardening**: Comprehensive server security benchmarks
-- **Cloudflare Zero Trust Integration**: Advanced proxy and DDoS protection
-
-## 🚀 Deployment Process
-
-The automated deployment process includes:
-
-1. **Pre-flight System Checks**: Validates all required dependencies
-2. **Secure Credential Management**: Encrypts all API keys and credentials
-3. **Rclone Configuration**: Sets up encrypted cloud storage
-4. **Borg Backup Integration**: Configures quantum-resistant backups
-5. **Cloudflare Domain Automation**: Automates DNS and proxy configuration
-6. **Server Hardening**: Applies CIS Level 2 security benchmarks
-7. **HSM Key Management**: Stores encryption keys in hardware
-8. **Distributed Trust Setup**: Splits master keys across geographic regions
-
-## 🔧 Advanced Configuration
-
-### Hardware Security Module Setup
+Just run the following command and follow the prompts:
 
 ```bash
-# Initialize YubiHSM with quantum-resistant algorithms
-python deploy.py --init-hsm
-
-# Verify HSM configuration
-yubihsm-shell --command="info session"
+curl -sL https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/install.sh | bash
 ```
 
-### Distributed Trust Configuration
+## 🔐 What Is PQ Matrix?
+
+PQ Matrix is a secure, privacy-focused Matrix server setup that features:
+
+- ✅ **Post-quantum encrypted** TURN server (Kyber-1024)
+- ✅ End-to-end encrypted voice/video calls
+- ✅ Single Sign-On (SSO) via Keycloak
+- ✅ GitLab webhook integration
+- ✅ Storj decentralized storage
+- ✅ Cloudflare DNS & proxy integration
+- ✅ Adaptive resource optimization
+- ✅ Zero-logs policy with metadata scrubbing
+
+## 🛠️ Features of the Installer
+
+### 📋 Automated Installation Phases
+
+The installer breaks down the setup process into clear phases:
+
+1. **Pre-Flight Checks**: System requirements verification
+2. **Configuration**: Interactive setup with user input
+3. **Domain Setup**: Cloudflare DNS automation
+4. **Service Installation**: Docker, Docker Compose, dependencies
+5. **Matrix Server Setup**: Conduit, COTURN, Nginx configuration
+6. **Security Configuration**: TLS, post-quantum encryption
+7. **Storage Integration**: Rclone and Storj setup
+8. **Backup Configuration**: Automated backup with retention policy
+9. **Hardening**: Server security enforcement
+10. **Finalization**: Post-install verification
+
+### ⚙️ Adaptive Resource Optimization
+
+The installer includes intelligent resource optimization:
+
+- **Hardware Detection**: Automatically detects CPU cores, memory, and disk space
+- **Optimization Levels**: 
+  - `Low`: Kyber-512, minimal resources (70% memory utilization)
+  - `Standard`: Kyber-768, balanced (80% memory utilization)
+  - `High`: Kyber-1024, maximum security (90% memory utilization)
+- **Auto-Downgrade**: When hardware constraints are detected
+
+### 🔒 Security Practices
+
+- **Pre-Flight Checks**: System validation before installation
+- **Atomic Operations**: With rollback capabilities if steps fail
+- **Audit Logging**: Detailed installation logs
+- **Encrypted Storage**: For all sensitive credentials
+- **No-Logs Policy**: Implementation of data minimization
+
+## 📝 Configuration Options
+
+The installer supports both interactive and non-interactive modes:
+
+### Interactive Mode (Default)
+
+Run without arguments for a step-by-step guided setup:
 
 ```bash
-# Generate threshold shards (3-of-5)
-python deploy.py --generate-shards
-
-# Deploy shards to secure locations
-python deploy.py --deploy-shards
+curl -sL https://raw.githubusercontent.com/your-org/pq-matrix-installer/main/install.sh | bash
 ```
 
-### Resource Optimization
+### Advanced Options
 
-The system automatically scans available resources and optimizes cryptographic parameters based on your hardware capabilities:
-
-```bash
-# View resource optimization details
-python deploy.py --optimize-resources
+```
+--optimization-level [low|standard|high]  Set resource optimization level
+--debug                                   Enable verbose logging
+--non-interactive                         Run with predefined config
+--config FILE                             Path to config file
+--skip-phases PHASES                      Comma-separated phases to skip
+--only-phase PHASE                        Run only a specific phase
 ```
 
-#### Optimization Levels
+## 📊 System Requirements
 
-| Resource Level | CPU Cores | Memory | Kyber Variant | Shard Count | Parallel Processing |
-|----------------|-----------|--------|---------------|-------------|---------------------|
-| Low            | < 4       | < 4GB  | Kyber512      | 3           | Disabled            |
-| Standard       | 4-8       | 4-16GB | Kyber768      | 5           | Limited             |
-| High           | > 8       | > 16GB | Kyber1024     | 5           | Full                |
+- **CPU**: 2+ cores (4+ recommended for high optimization)
+- **RAM**: 2GB+ (4GB+ recommended)
+- **Storage**: 20GB+ free space
+- **OS**: Ubuntu 20.04+, Debian 11+, or similar Linux
+- **Network**: Ports 80, 443, 3478, 5349 available
 
-The system automatically adjusts:
-- **Thread Pool Size**: Optimized for your CPU core count
-- **Memory Buffer Allocation**: Scaled based on available RAM
-- **Compression Level**: Adjusted based on available disk space
-- **Cryptographic Parameters**: Security level balanced with performance
+## 🌐 Cloudflare Integration
 
-## 📊 Security Verification
+The installer automates Cloudflare DNS setup and proxy configuration:
 
-```bash
-# Run comprehensive security audit
-python deploy.py --audit-security
+- Automatic DNS record creation
+- Cloudflare proxy integration for additional security
+- Certificate management
 
-# Test quantum resistance
-python deploy.py --test-quantum-resistance
-```
+## ⚠️ Security Best Practices
 
-## 🔍 Troubleshooting
-
-### Common Issues
-
-1. **HSM Connection Failure**
-   - Ensure YubiHSM is properly connected
-   - Verify USB permissions with `lsusb`
-
-2. **Shard Deployment Failure**
-   - Check SSH keys for remote servers
-   - Verify network connectivity to shard locations
-
-3. **Quantum Library Issues**
-   - Install liboqs dependencies: `apt install liboqs-dev`
-   - Update to latest version: `pip install -U liboqs`
-
-## 🤝 Contributing
-
-We welcome contributions to enhance the security and usability of this project:
-
-1. Fork the repository
-2. Create your feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+- Regularly update with `pq-matrix update`
+- Rotate encryption keys quarterly (automated by default)
+- Monitor logs for suspicious activity
+- Follow the 3-2-1 backup rule (3 copies, 2 storage types, 1 offsite)
 
 ## 📜 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+No commercial rights or licenses are granted. This project is in the public domain.
 
-## 🔐 Security Features
+## 📚 Documentation
 
-- ✅ Kyber-1024 Post-Quantum Encryption
-- ✅ Hardware Security Module Integration
-- ✅ Distributed Trust Protocol (3-of-5)
-- ✅ Zero-Knowledge Audit System
-- ✅ Geographic Shard Distribution
-- ✅ Memory-Safe Implementation
-- ✅ CIS Level 2 Server Hardening
-- ✅ Cloudflare Zero Trust Integration
-- ✅ Atomic Operations with Rollback
-- ✅ Immutable Audit Logging
-- ✅ Adaptive Resource Optimization
+Detailed documentation can be found in the [docs](./docs) directory.
+
+The original Matrix server deployment instructions have been archived to [docs/archived/README-original.md](./docs/archived/README-original.md).
