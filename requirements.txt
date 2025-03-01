@@ -1,0 +1,8 @@
+cloudflare
+requests
+borgbackup
+python-dotenv
+click
+pyhsm>=2.4.0
+threshold-crypto==0.5.1
+liboqs>=0.8.0

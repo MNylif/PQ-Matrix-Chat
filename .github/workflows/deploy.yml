@@ -1,0 +1,26 @@
+name: Deployment Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y rclone borgbackup libxxhash-dev
+        pip install -r requirements.txt
+
+    - name: Test deployment dry-run
+      run: |
+        python deploy.py --dry-run
